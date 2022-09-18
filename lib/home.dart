@@ -11,17 +11,30 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
-  Duration duration = Duration();
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  Duration duration = const Duration();
   int hour = 0;
   int minute = 0;
   int second = 0;
-  Duration remaining = Duration();
+  Duration remaining = const Duration();
   Timer? timer;
+  bool isPlaying = false;
+  late AnimationController controller;
 
   @override
   void initState() {
     super.initState();
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   void addTime() {
@@ -36,9 +49,33 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void toggleIcon() => setState(() {
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+          controller.forward();
+          startTimer();
+        } else {
+          controller.reverse();
+          stopTimer();
+        }
+      });
+
+  refresh() {
+    setState(() {});
+  }
+
   void startTimer() {
     remaining = Duration(seconds: hour * 3600 + minute * 60 + second);
-    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+    timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+  }
+
+  void stopTimer() {
+    // if (resets) {
+    //   resets()
+    // }
+    setState(() {
+      timer?.cancel();
+    });
   }
 
   @override
@@ -47,12 +84,11 @@ class _HomeState extends State<Home> {
     var now = DateTime.now();
     var formattedTime = DateFormat('HH:mm').format(now);
     var formattedDate = DateFormat('EEE, d/M/y').format(now);
-    hour = remaining.inHours;
-    minute = remaining.inMinutes.remainder(60);
-    second = remaining.inSeconds.remainder(60);
-    // var hours = remaining.inHours;
-    // var minutes = twoDigits(remaining.inMinutes.remainder(60));
-    // var seconds = twoDigits(remaining.inSeconds.remainder(60));
+    if (isPlaying) {
+      hour = remaining.inHours;
+      minute = remaining.inMinutes.remainder(60);
+      second = remaining.inSeconds.remainder(60);
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -63,13 +99,15 @@ class _HomeState extends State<Home> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 buildTimeCard(hour, 'h'),
-                const SizedBox(
-                  width: 8,
-                ),
+                buildComma(),
+                // const SizedBox(
+                //   width: 8,
+                // ),
                 buildTimeCard(minute, 'm'),
-                const SizedBox(
-                  width: 8,
-                ),
+                // const SizedBox(
+                //   width: 8,
+                // ),
+                buildComma(),
                 buildTimeCard(second, 's'),
               ],
             ),
@@ -80,7 +118,7 @@ class _HomeState extends State<Home> {
               padding: const EdgeInsets.fromLTRB(100, 32, 0, 0),
               child: Text(
                 formattedTime,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -94,11 +132,28 @@ class _HomeState extends State<Home> {
               padding: const EdgeInsets.fromLTRB(0, 32, 100, 0),
               child: Text(
                 formattedDate,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 100, 32),
+              child: IconButton(
+                iconSize: 50,
+                icon: AnimatedIcon(
+                  icon: AnimatedIcons.play_pause,
+                  progress: controller,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  toggleIcon();
+                },
               ),
             ),
           ),
@@ -108,19 +163,34 @@ class _HomeState extends State<Home> {
   }
 
   void updateDrag(DragUpdateDetails details, String label) {
-    int offset = details.delta.dy.round() * -1;
+    int divFactor = (label == "h") ? 8 : 4;
+
+    int offset = (details.delta.dy / divFactor).round() * -1;
     switch (label) {
       case 'h':
-        if (hour + offset >= 0) hour += offset;
+        if (hour + offset >= 0 && hour + offset <= 60) hour += offset;
         break;
       case 'm':
-        if (minute + offset >= 0) minute += offset;
+        if (minute + offset >= 0 && minute + offset <= 60) minute += offset;
         break;
       case 's':
-        if (second + offset >= 0) second += offset;
+        if (second + offset >= 0 && second + offset <= 60) second += offset;
         break;
     }
+
     print("$label $offset $hour $minute $second");
+    refresh();
+  }
+
+  Text buildComma() {
+    return Text(
+      ":",
+      style: const TextStyle(
+        fontSize: 150,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    );
   }
 
   GestureDetector buildTimeCard(int time, String label) {
@@ -132,8 +202,8 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.all(8.0),
         child: Text(
           time.toString(),
-          style: TextStyle(
-            fontSize: 170,
+          style: const TextStyle(
+            fontSize: 150,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
