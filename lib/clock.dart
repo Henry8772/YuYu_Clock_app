@@ -4,26 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+class Clock extends StatefulWidget {
+  String clockType;
+  Clock({Key? key, required this.clockType}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Clock> createState() => _ClockState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   Duration duration = const Duration();
-  int hour = 0;
-  int minute = 0;
-  int second = 0;
+  int shownHour = 0;
+  int shownMin = 0;
+  int shownSec = 0;
+  Duration setCountdown = const Duration();
   Duration remaining = const Duration();
   Timer? timer;
   bool isPlaying = false;
   late AnimationController controller;
+  String clockType = 'Countdown';
 
   @override
   void initState() {
     super.initState();
+    clockType = widget.clockType;
 
     controller = AnimationController(
       vsync: this,
@@ -33,6 +37,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    timer?.cancel();
     controller.dispose();
     super.dispose();
   }
@@ -40,7 +45,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void addTime() {
     setState(() {
       final seconds = duration.inSeconds + 1;
-      if (remaining.inSeconds == 0) {
+      if (clockType == "Countdown" && remaining.inSeconds == 0) {
         timer?.cancel();
       } else {
         remaining = Duration(seconds: remaining.inSeconds - 1);
@@ -65,29 +70,46 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   void startTimer() {
-    remaining = Duration(seconds: hour * 3600 + minute * 60 + second);
+    remaining = Duration(seconds: shownHour * 3600 + shownMin * 60 + shownSec);
+    setCountdown = remaining;
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+    print("$duration.inSeconds ");
   }
 
   void stopTimer() {
-    // if (resets) {
-    //   resets()
-    // }
     setState(() {
       timer?.cancel();
     });
   }
 
+  void resetTimer() {
+    if (isPlaying) {
+      toggleIcon();
+      stopTimer();
+    }
+    shownHour = 0;
+    shownMin = 0;
+    shownSec = 0;
+
+    setState(() => duration = const Duration());
+  }
+
   @override
   Widget build(BuildContext context) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    // String twoDigits(int n) => n.toString().padLeft(2, '0');
     var now = DateTime.now();
     var formattedTime = DateFormat('HH:mm').format(now);
     var formattedDate = DateFormat('EEE, d/M/y').format(now);
-    if (isPlaying) {
-      hour = remaining.inHours;
-      minute = remaining.inMinutes.remainder(60);
-      second = remaining.inSeconds.remainder(60);
+    print("$isPlaying $clockType $duration.inSeconds ");
+    if (isPlaying && clockType == 'Countdown') {
+      shownHour = remaining.inHours;
+      shownMin = remaining.inMinutes.remainder(60);
+      shownSec = remaining.inSeconds.remainder(60);
+    } else if (isPlaying && clockType == 'Timer') {
+      shownHour = duration.inHours;
+      shownMin = duration.inMinutes.remainder(60);
+      shownSec = duration.inSeconds.remainder(60);
+      print("Is playing and in timer $shownHour $shownMin $shownSec");
     }
 
     return Scaffold(
@@ -98,17 +120,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                buildTimeCard(hour, 'h'),
+                buildTimeCard(shownHour, 'h'),
                 buildComma(),
                 // const SizedBox(
                 //   width: 8,
                 // ),
-                buildTimeCard(minute, 'm'),
+                buildTimeCard(shownMin, 'm'),
                 // const SizedBox(
                 //   width: 8,
                 // ),
                 buildComma(),
-                buildTimeCard(second, 's'),
+                buildTimeCard(shownSec, 's'),
               ],
             ),
           ),
@@ -117,7 +139,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(100, 32, 0, 0),
               child: Text(
-                formattedTime,
+                "$clockType $formattedTime",
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -157,28 +179,51 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(100, 0, 0, 32),
+              child: IconButton(
+                iconSize: 50,
+                icon: Icon(
+                  Icons.restart_alt,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  resetTimer();
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   void updateDrag(DragUpdateDetails details, String label) {
+    if (clockType != 'Countdown') return;
     int divFactor = (label == "h") ? 8 : 4;
 
     int offset = (details.delta.dy / divFactor).round() * -1;
     switch (label) {
       case 'h':
-        if (hour + offset >= 0 && hour + offset <= 60) hour += offset;
+        if (shownHour + offset >= 0 && shownHour + offset <= 60) {
+          shownHour += offset;
+        }
         break;
       case 'm':
-        if (minute + offset >= 0 && minute + offset <= 60) minute += offset;
+        if (shownMin + offset >= 0 && shownMin + offset <= 60) {
+          shownMin += offset;
+        }
         break;
       case 's':
-        if (second + offset >= 0 && second + offset <= 60) second += offset;
+        if (shownSec + offset >= 0 && shownSec + offset <= 60) {
+          shownSec += offset;
+        }
         break;
     }
 
-    print("$label $offset $hour $minute $second");
+    print("$label $offset $shownHour $shownMin $shownSec");
     refresh();
   }
 
