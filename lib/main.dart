@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:simplicity_clock/clock.dart';
+import 'package:flutter/services.dart';
+import 'package:simplicity_clock/page/calendar.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:simplicity_clock/page/page.dart';
 
@@ -14,10 +15,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Wakelock.enable();
+    hideNavBar();
     return MaterialApp(
       title: 'Flutter Demo',
-      home: Boarding(),
+      home: Calendar(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
+
+Future hideNavBar() async =>
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top]);

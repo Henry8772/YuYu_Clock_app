@@ -100,7 +100,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
     var now = DateTime.now();
     var formattedTime = DateFormat('HH:mm').format(now);
     var formattedDate = DateFormat('EEE, d/M/y').format(now);
-    print("$isPlaying $clockType $duration.inSeconds ");
+    // print("$isPlaying $clockType $duration.inSeconds ");
     if (isPlaying && clockType == 'Countdown') {
       shownHour = remaining.inHours;
       shownMin = remaining.inMinutes.remainder(60);
@@ -109,7 +109,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
       shownHour = duration.inHours;
       shownMin = duration.inMinutes.remainder(60);
       shownSec = duration.inSeconds.remainder(60);
-      print("Is playing and in timer $shownHour $shownMin $shownSec");
+      // print("Is playing and in timer $shownHour $shownMin $shownSec");
     }
 
     return Scaffold(
@@ -202,8 +202,8 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
 
   void updateDrag(DragUpdateDetails details, String label) {
     if (clockType != 'Countdown') return;
-    int divFactor = (label == "h") ? 8 : 4;
-
+    // int divFactor = (label == "h") ? 8 : 4;
+    int divFactor = 2;
     int offset = (details.delta.dy / divFactor).round() * -1;
     switch (label) {
       case 'h':

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:simplicity_clock/clock.dart';
+import 'package:simplicity_clock/page/calendar.dart';
 
 class Boarding extends StatefulWidget {
   const Boarding({super.key});
@@ -17,6 +18,7 @@ class _SliderState extends State<Boarding> {
         showDoneButton: false,
         globalBackgroundColor: Colors.black,
         rawPages: [
+          Calendar(),
           Clock(
             clockType: 'Countdown',
           ),
