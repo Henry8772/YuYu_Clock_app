@@ -44,7 +44,7 @@ class _CalendarState extends State<Calendar> {
 
   Widget calendar() {
     return FractionallySizedBox(
-      widthFactor: 0.5,
+      widthFactor: 1,
       alignment: Alignment.topLeft,
       child: Container(
         margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -61,6 +61,7 @@ class _CalendarState extends State<Calendar> {
             ]),
         child: TableCalendar(
           startingDayOfWeek: StartingDayOfWeek.monday,
+          shouldFillViewport: true,
           headerStyle: const HeaderStyle(
             formatButtonVisible: false,
             titleTextStyle: TextStyle(
@@ -102,6 +103,8 @@ class _CalendarState extends State<Calendar> {
             return isSameDay(_selectedDay, day);
           },
           onDaySelected: (selectedDay, focusedDay) {
+            print("$selectedDay $focusedDay");
+            selectCalendarDate(selectedDay);
             setState(() {
               _selectedDay = selectedDay;
               // _focusedDay = focusedDay; // update `_focusedDay` here as well
@@ -112,14 +115,19 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Widget eventTitle() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
-      child: const Text(
-        "Events",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
+  void selectCalendarDate(DateTime selectedDay) {}
+
+  Padding eventTitle() {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(24, 8, 8, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          "History",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+          ),
         ),
       ),
     );
@@ -127,52 +135,91 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 8, 0),
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(child: calendar()),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                eventTitle(),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.purple, Colors.red],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          // color: Colors.orange,
+          child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(child: calendar()),
+              Expanded(
+                child: Container(
+                  // color: Colors.blue,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            Icons.label,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          const Text(
-                            "Timer",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        'Office',
-                        style: TextStyle(color: Colors.white),
-                      )
+                      eventTitle(),
+                      createEventBar(),
+                      createEventBar(),
                     ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container createEventBar() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      // color: Colors.red,
+      // width: 300,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: const BoxDecoration(
+            // color: Colors.white,
+            // gradient: LinearGradient(
+            //   colors: [Colors.purple, Colors.red],
+            //   begin: Alignment.centerLeft,
+            //   end: Alignment.centerRight,
+            // ),
+            // borderRadius: BorderRadius.all(Radius.circular(20))
+            ),
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Icon(
+                  Icons.label,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  "Timer",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text(
+                  'Duration',
+                  style: TextStyle(color: Colors.white),
+                ),
+                // SizedBox(
+                //   height: 4,
+                // ),
+                Text(
+                  '1:00:00',
+                  style: TextStyle(
+                    color: Colors.white,
+                    // fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
