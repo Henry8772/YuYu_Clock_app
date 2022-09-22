@@ -39,6 +39,8 @@ dependencies:
   shared_preferences: ^2.0.15
   table_calendar: ^3.0.7
   sqflite: ^2.1.0
+  json_serializable: ^6.4.0
+  json_annotation: ^4.7.0
 
 
 dev_dependencies:

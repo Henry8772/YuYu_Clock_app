@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/services.dart';
+import 'package:simplicity_clock/helpers/db.dart';
+import 'package:simplicity_clock/model/event.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -11,6 +13,8 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
+  late Event event;
+  bool isLoading = false;
   DateTime _selectedDay = DateTime.now();
 
   // CalendarController _calendarController = CalendarController();
@@ -114,6 +118,14 @@ class _CalendarState extends State<Calendar> {
       ),
     );
   }
+
+  // Future refreshCalendar() async {
+  //   setState(() => isLoading = true);
+
+  //   this.event = await CalendarDatabase.instance.readEvent(widget.id);
+
+  //   setState(() => isLoading = false);
+  // }
 
   void selectCalendarDate(DateTime selectedDay) {}
 
