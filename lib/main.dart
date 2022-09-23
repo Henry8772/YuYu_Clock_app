@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Wakelock.enable();
+    WidgetsFlutterBinding.ensureInitialized();
     hideNavBar();
     return MaterialApp(
       title: 'Flutter Demo',

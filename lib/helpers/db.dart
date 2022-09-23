@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:simplicity_clock/model/event.dart';
 
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -33,11 +34,14 @@ class CalendarDatabase {
   Future _createDB(Database db, int version) async {
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     final durationType = 'INTEGER NOT NULL';
+    final textType = 'TEXT NOT NULL';
 
     await db.execute('''
 CREATE TABLE $tableEvents (
   ${EventFields.id} $idType,
   ${EventFields.duration} $durationType,
+  ${EventFields.createdDate} $textType,
+  ${EventFields.createdTime} $textType,
 )
 
 ''');
@@ -76,10 +80,29 @@ CREATE TABLE $tableEvents (
     }
   }
 
+  Future<Event> readEventByDate(DateTime day) async {
+    final db = await instance.database;
+
+    String date = DateFormat('yyyy-MM-dd').format(day);
+
+    final maps = await db.query(
+      tableEvents,
+      columns: EventFields.values,
+      where: '${EventFields.createdDate} = ?',
+      whereArgs: [date],
+    );
+
+    if (maps.isNotEmpty) {
+      return Event.fromJson(maps.first);
+    } else {
+      throw Exception('Day $day not found');
+    }
+  }
+
   Future<List<Event>> readAllNotes() async {
     final db = await instance.database;
 
-    final orderBy = '${EventFields.createTime} ASC';
+    final orderBy = '${EventFields.createdTime} ASC';
 
     final result = await db.query(tableEvents, orderBy: orderBy);
 

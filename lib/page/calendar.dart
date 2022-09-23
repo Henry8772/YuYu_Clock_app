@@ -28,10 +28,21 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+
+    selectDate(_selectedDay);
+  }
+
+  void selectDate(DateTime selectedDay) {
+    print('RetrieveEventByDay $selectedDay');
+    refreshCalendar(selectedDay);
+  }
+
+  Future refreshCalendar(DateTime selectedDay) async {
+    setState(() => isLoading = true);
+
+    this.event = await CalendarDatabase.instance.readEventByDate(selectedDay);
+
+    setState(() => isLoading = false);
   }
 
   void dispose() {
@@ -108,26 +119,17 @@ class _CalendarState extends State<Calendar> {
           },
           onDaySelected: (selectedDay, focusedDay) {
             print("$selectedDay $focusedDay");
-            selectCalendarDate(selectedDay);
+
             setState(() {
               _selectedDay = selectedDay;
               // _focusedDay = focusedDay; // update `_focusedDay` here as well
             });
+            selectDate(selectedDay);
           },
         ),
       ),
     );
   }
-
-  // Future refreshCalendar() async {
-  //   setState(() => isLoading = true);
-
-  //   this.event = await CalendarDatabase.instance.readEvent(widget.id);
-
-  //   setState(() => isLoading = false);
-  // }
-
-  void selectCalendarDate(DateTime selectedDay) {}
 
   Padding eventTitle() {
     return const Padding(
