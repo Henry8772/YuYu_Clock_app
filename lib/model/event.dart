@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 final String tableEvents = 'events';
 
 class EventFields {
@@ -37,8 +39,10 @@ class Event {
   Map<String, Object?> toJson() => {
         'id': id,
         'duration': duration,
-        'createdDate': createdDate.toIso8601String(),
-        'createdTime': createdTime.toIso8601String(),
+        'createdDate': DateFormat('yyyy-MM-dd').format(createdDate),
+        'createdTime': DateFormat('hh:mm').format(createdDate),
+        // 'createdDate': createdDate.toIso8601String(),
+        // 'createdTime': createdTime.toIso8601String(),
       };
 
   static Event fromJson(Map<String, Object?> json) => Event(

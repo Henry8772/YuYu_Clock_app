@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     hideNavBar();
     return MaterialApp(
       title: 'Flutter Demo',
-      home: Calendar(),
+      home: Boarding(),
       debugShowCheckedModeBanner: false,
     );
   }

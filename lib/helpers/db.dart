@@ -1,11 +1,11 @@
-import 'dart:collection';
+// import 'dart:collection';
 import 'package:simplicity_clock/model/event.dart';
 
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqlite_api.dart';
-import 'package:json_annotation/json_annotation.dart';
+// import 'package:sqflite/sqlite_api.dart';
+// import 'package:json_annotation/json_annotation.dart';
 
 class CalendarDatabase {
   static final CalendarDatabase instance = CalendarDatabase._init();
@@ -32,9 +32,9 @@ class CalendarDatabase {
   }
 
   Future _createDB(Database db, int version) async {
-    final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final durationType = 'INTEGER NOT NULL';
-    final textType = 'TEXT NOT NULL';
+    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const durationType = 'INTEGER NOT NULL';
+    const textType = 'TEXT NOT NULL';
 
     await db.execute('''
 CREATE TABLE $tableEvents (

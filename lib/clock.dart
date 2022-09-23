@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:simplicity_clock/helpers/db.dart';
+
+import 'model/event.dart';
 
 class Clock extends StatefulWidget {
   String clockType;
@@ -23,6 +26,8 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   bool isPlaying = false;
   late AnimationController controller;
   String clockType = 'Countdown';
+  late int storedDuration;
+  late DateTime createdDateTime;
 
   @override
   void initState() {
@@ -47,6 +52,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
       final seconds = duration.inSeconds + 1;
       if (clockType == "Countdown" && remaining.inSeconds == 0) {
         timer?.cancel();
+        completeTimer();
       } else {
         remaining = Duration(seconds: remaining.inSeconds - 1);
         duration = Duration(seconds: seconds);
@@ -73,7 +79,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
     remaining = Duration(seconds: shownHour * 3600 + shownMin * 60 + shownSec);
     setCountdown = remaining;
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
-    print("$duration.inSeconds ");
+    print("$duration.inSeconds");
   }
 
   void stopTimer() {
@@ -92,6 +98,23 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
     shownSec = 0;
 
     setState(() => duration = const Duration());
+  }
+
+  void completeTimer() {
+    storedDuration = setCountdown.inSeconds;
+    createdDateTime = DateTime.now();
+    print("$storedDuration + $createdDateTime");
+    addEvent();
+  }
+
+  Future addEvent() async {
+    final note = Event(
+      duration: storedDuration,
+      createdDate: createdDateTime,
+      createdTime: createdDateTime,
+    );
+
+    await CalendarDatabase.instance.create(note);
   }
 
   @override
