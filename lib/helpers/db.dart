@@ -41,13 +41,17 @@ CREATE TABLE $tableEvents (
   ${EventFields.id} $idType,
   ${EventFields.duration} $durationType,
   ${EventFields.createdDate} $textType,
-  ${EventFields.createdTime} $textType,
+  ${EventFields.createdTime} $textType
 )
 
 ''');
   }
 
   Future<Event> create(Event event) async {
+    String path = await getDatabasesPath();
+
+    print(path);
+
     final db = await instance.database;
 
     // final json = event.toJson();

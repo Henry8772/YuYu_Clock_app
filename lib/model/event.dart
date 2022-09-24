@@ -37,8 +37,8 @@ class Event {
           createdTime: createdTime ?? this.createdTime);
 
   Map<String, Object?> toJson() => {
-        'id': id,
-        'duration': duration,
+        // 'id': id,
+        'duration': duration.toString(),
         'createdDate': DateFormat('yyyy-MM-dd').format(createdDate),
         'createdTime': DateFormat('hh:mm').format(createdDate),
         // 'createdDate': createdDate.toIso8601String(),
