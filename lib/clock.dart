@@ -19,7 +19,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   Duration duration = const Duration();
   int shownHour = 0;
   int shownMin = 0;
-  int shownSec = 0;
+  int shownSec = 1;
   Duration setCountdown = const Duration();
   Duration remaining = const Duration();
   Timer? timer;
@@ -114,7 +114,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
       createdTime: createdDateTime,
     );
 
-    await CalendarDatabase.instance.create(note);
+    await CalendarDatabase.instance.insertEvent(note);
   }
 
   @override

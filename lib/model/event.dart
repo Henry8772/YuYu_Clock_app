@@ -1,14 +1,15 @@
 import 'package:intl/intl.dart';
 
-final String tableEvents = 'events';
+final String databaseName = 'history';
 
 class EventFields {
   static final List<String> values = [id, duration, createdDate, createdTime];
 
+  // column name of the database table
   static final String id = '_id';
   static final String duration = 'duration';
-  static final String createdDate = 'date';
-  static final String createdTime = 'time';
+  static final String createdDate = 'createdDate';
+  static final String createdTime = 'createdTime';
 }
 
 class Event {
@@ -48,7 +49,8 @@ class Event {
   static Event fromJson(Map<String, Object?> json) => Event(
         id: json[EventFields.id] as int?,
         duration: json[EventFields.duration] as int,
-        createdDate: json[EventFields.createdDate] as DateTime,
-        createdTime: json[EventFields.createdTime] as DateTime,
+        createdDate:
+            DateFormat('yyyy-MM-dd').parse(json['createdDate'].toString()),
+        createdTime: DateFormat('hh:mm').parse(json['createdTime'].toString()),
       );
 }

@@ -13,7 +13,7 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
-  late Event event;
+  late List<Event> events = [];
   bool isLoading = false;
   DateTime _selectedDay = DateTime.now();
 
@@ -32,17 +32,20 @@ class _CalendarState extends State<Calendar> {
     selectDate(_selectedDay);
   }
 
-  void selectDate(DateTime selectedDay) {
+  void selectDate(DateTime selectedDay) async {
     print('RetrieveEventByDay $selectedDay');
+
     refreshCalendar(selectedDay);
   }
 
   Future refreshCalendar(DateTime selectedDay) async {
-    setState(() => isLoading = true);
+    // setState(() => isLoading = true);
 
-    this.event = await CalendarDatabase.instance.readEventByDate(selectedDay);
+    events = await CalendarDatabase.instance.readEventByDate(selectedDay);
 
-    setState(() => isLoading = false);
+    // print("$events.id, $this.event.duration");
+
+    // setState(() => isLoading = false);
   }
 
   void dispose() {
@@ -166,8 +169,8 @@ class _CalendarState extends State<Calendar> {
                     // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       eventTitle(),
-                      createEventBar(),
-                      createEventBar(),
+                      createEventBar('Timer', '1:00:00'),
+                      createEventBar('Timer', '1:15:00'),
                     ],
                   ),
                 ),
@@ -179,28 +182,18 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Container createEventBar() {
+  Container createEventBar(String title, String duration) {
     return Container(
       padding: EdgeInsets.all(8),
       // color: Colors.red,
       // width: 300,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: const BoxDecoration(
-            // color: Colors.white,
-            // gradient: LinearGradient(
-            //   colors: [Colors.purple, Colors.red],
-            //   begin: Alignment.centerLeft,
-            //   end: Alignment.centerRight,
-            // ),
-            // borderRadius: BorderRadius.all(Radius.circular(20))
-            ),
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Icon(
                   Icons.label,
                   color: Colors.white,
@@ -210,7 +203,7 @@ class _CalendarState extends State<Calendar> {
                   width: 8,
                 ),
                 Text(
-                  "Timer",
+                  title,
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -220,19 +213,15 @@ class _CalendarState extends State<Calendar> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 Text(
                   'Duration',
                   style: TextStyle(color: Colors.white),
                 ),
-                // SizedBox(
-                //   height: 4,
-                // ),
                 Text(
-                  '1:00:00',
+                  duration,
                   style: TextStyle(
                     color: Colors.white,
-                    // fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
