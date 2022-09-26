@@ -17,6 +17,8 @@ class _SliderState extends State<Boarding> {
         showNextButton: false,
         showDoneButton: false,
         globalBackgroundColor: Colors.black,
+        isProgress: false,
+        onChange: (value) => {if (value == 0) {}},
         rawPages: [
           Calendar(),
           Clock(

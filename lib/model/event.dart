@@ -41,7 +41,7 @@ class Event {
         // 'id': id,
         'duration': duration.toString(),
         'createdDate': DateFormat('yyyy-MM-dd').format(createdDate),
-        'createdTime': DateFormat('hh:mm').format(createdDate),
+        'createdTime': DateFormat('HH:mm').format(createdDate),
         // 'createdDate': createdDate.toIso8601String(),
         // 'createdTime': createdTime.toIso8601String(),
       };
@@ -51,6 +51,6 @@ class Event {
         duration: json[EventFields.duration] as int,
         createdDate:
             DateFormat('yyyy-MM-dd').parse(json['createdDate'].toString()),
-        createdTime: DateFormat('hh:mm').parse(json['createdTime'].toString()),
+        createdTime: DateFormat('HH:mm').parse(json['createdTime'].toString()),
       );
 }

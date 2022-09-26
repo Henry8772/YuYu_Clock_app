@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:simplicity_clock/helpers/db.dart';
 
@@ -19,7 +19,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   Duration duration = const Duration();
   int shownHour = 0;
   int shownMin = 0;
-  int shownSec = 1;
+  int shownSec = 0;
   Duration setCountdown = const Duration();
   Duration remaining = const Duration();
   Timer? timer;
@@ -33,6 +33,10 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     clockType = widget.clockType;
+
+    if (clockType == 'Countdown') {
+      shownHour = 2;
+    }
 
     controller = AnimationController(
       vsync: this,
@@ -76,6 +80,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   }
 
   void startTimer() {
+    createdDateTime = DateTime.now();
     remaining = Duration(seconds: shownHour * 3600 + shownMin * 60 + shownSec);
     setCountdown = remaining;
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
@@ -101,8 +106,9 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   }
 
   void completeTimer() {
+    toggleIcon();
     storedDuration = setCountdown.inSeconds;
-    createdDateTime = DateTime.now();
+
     print("$storedDuration + $createdDateTime");
     addEvent();
   }
@@ -119,7 +125,6 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // String twoDigits(int n) => n.toString().padLeft(2, '0');
     var now = DateTime.now();
     var formattedTime = DateFormat('HH:mm').format(now);
     var formattedDate = DateFormat('EEE, d/M/y').format(now);
@@ -246,14 +251,16 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
         break;
     }
 
-    print("$label $offset $shownHour $shownMin $shownSec");
+    // print("$label $offset $shownHour $shownMin $shownSec");
     refresh();
   }
 
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+
   Text buildComma() {
-    return Text(
+    return const Text(
       ":",
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 150,
         fontWeight: FontWeight.bold,
         color: Colors.white,
@@ -269,7 +276,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          time.toString(),
+          twoDigits(time),
           style: const TextStyle(
             fontSize: 150,
             fontWeight: FontWeight.bold,

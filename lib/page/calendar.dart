@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/services.dart';
 import 'package:simplicity_clock/helpers/db.dart';
@@ -14,16 +15,9 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   late List<Event> events = [];
-  bool isLoading = false;
   DateTime _selectedDay = DateTime.now();
-
-  // CalendarController _calendarController = CalendarController();
-  Map<DateTime, List<dynamic>> _events = {};
-  // List<CalendarItem> _data = [];
-
-  List<dynamic> _selectedEvents = [];
-  // List<Widget> get _eventWidgets =>
-  // _selectedEvents.map((e) => events(e)).toList();
+  // Map<DateTime, List<dynamic>> _events = {};
+  // List<dynamic> _selectedEvents = [];
 
   @override
   void initState() {
@@ -45,7 +39,7 @@ class _CalendarState extends State<Calendar> {
 
     // print("$events.id, $this.event.duration");
 
-    // setState(() => isLoading = false);
+    setState(() {});
   }
 
   void dispose() {
@@ -59,80 +53,6 @@ class _CalendarState extends State<Calendar> {
   //     _selectedEvents = events;
   //   });
   // }
-
-  Widget calendar() {
-    return FractionallySizedBox(
-      widthFactor: 1,
-      alignment: Alignment.topLeft,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-                colors: [Color(0xFFE53935), Color(0xFFEF5350)]),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 24,
-                  offset: new Offset(0.0, 5))
-            ]),
-        child: TableCalendar(
-          startingDayOfWeek: StartingDayOfWeek.monday,
-          shouldFillViewport: true,
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleTextStyle: TextStyle(
-              color: Colors.white,
-              // fontSize: 0,
-            ),
-            // leftChevronVisible: false,
-            // rightChevronVisible: false,
-            leftChevronIcon: Icon(
-              Icons.chevron_left,
-              color: Colors.white,
-            ),
-            rightChevronIcon: Icon(
-              Icons.chevron_right,
-              color: Colors.white,
-            ),
-          ),
-          calendarStyle: const CalendarStyle(
-            cellPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            todayTextStyle: TextStyle(
-                color: Colors.redAccent,
-                fontSize: 15,
-                fontWeight: FontWeight.bold),
-            selectedDecoration: BoxDecoration(
-              color: Color(0xFFB71C1C),
-              shape: BoxShape.circle,
-            ),
-            weekNumberTextStyle: TextStyle(color: Colors.white),
-            defaultTextStyle: TextStyle(color: Colors.white),
-            weekendTextStyle: TextStyle(color: Colors.white),
-            outsideTextStyle: TextStyle(color: Colors.white60),
-            withinRangeTextStyle: TextStyle(color: Colors.white),
-            outsideDaysVisible: false,
-          ),
-          firstDay: DateTime.utc(2010, 10, 16),
-          lastDay: DateTime.utc(2030, 3, 14),
-          focusedDay: DateTime.now(),
-          selectedDayPredicate: (day) {
-            return isSameDay(_selectedDay, day);
-          },
-          onDaySelected: (selectedDay, focusedDay) {
-            print("$selectedDay $focusedDay");
-
-            setState(() {
-              _selectedDay = selectedDay;
-              // _focusedDay = focusedDay; // update `_focusedDay` here as well
-            });
-            selectDate(selectedDay);
-          },
-        ),
-      ),
-    );
-  }
 
   Padding eventTitle() {
     return const Padding(
@@ -152,10 +72,11 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    print("$events ${events.length}");
     return Scaffold(
       backgroundColor: Colors.black,
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(36, 8, 24, 8),
         child: Container(
           // color: Colors.orange,
           child: Row(
@@ -163,16 +84,22 @@ class _CalendarState extends State<Calendar> {
             children: <Widget>[
               Expanded(child: calendar()),
               Expanded(
-                child: Container(
-                  // color: Colors.blue,
-                  child: Column(
-                    // crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      eventTitle(),
-                      createEventBar('Timer', '1:00:00'),
-                      createEventBar('Timer', '1:15:00'),
-                    ],
-                  ),
+                // color: Colors.blue,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    eventTitle(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: events.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return createEventBar(
+                            DateFormat('HH:mm')
+                                .format(events[index].createdTime),
+                            formatTime(events[index].duration));
+                      },
+                    ),
+                  ],
                 ),
               )
             ],
@@ -182,11 +109,13 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Container createEventBar(String title, String duration) {
+  String formatTime(int seconds) {
+    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  }
+
+  Container createEventBar(String createdTime, String duration) {
     return Container(
       padding: EdgeInsets.all(8),
-      // color: Colors.red,
-      // width: 300,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Column(
@@ -203,7 +132,7 @@ class _CalendarState extends State<Calendar> {
                   width: 8,
                 ),
                 Text(
-                  title,
+                  createdTime,
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -228,6 +157,88 @@ class _CalendarState extends State<Calendar> {
               ],
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget calendar() {
+    return FractionallySizedBox(
+      // widthFactor: 1,
+      alignment: Alignment.topLeft,
+      child: Container(
+        // color: Colors.blue,
+        // margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+                colors: [Color(0xFFE53935), Color(0xFFEF5350)]),
+            // const LinearGradient(colors: [Colors.pink, Colors.pink[200]]),
+
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 24,
+                  offset: new Offset(0.0, 5))
+            ]),
+        child: TableCalendar(
+          // calendarFormat: CalendarFormat.twoWeeks,
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          // daysOfWeekHeight: 10,
+          // rowHeight: 10,
+          shouldFillViewport: true,
+          headerStyle: const HeaderStyle(
+            formatButtonVisible: false,
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              // fontSize: 0,
+            ),
+            // leftChevronVisible: false,
+            // rightChevronVisible: false,
+            leftChevronIcon: Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+            ),
+            rightChevronIcon: Icon(
+              Icons.chevron_right,
+              color: Colors.white,
+            ),
+          ),
+          calendarStyle: const CalendarStyle(
+            // cellMargin: EdgeInsets.all(0),
+            // cellPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            todayTextStyle: TextStyle(
+                color: Colors.redAccent,
+                fontSize: 15,
+                fontWeight: FontWeight.bold),
+            selectedDecoration: BoxDecoration(
+              color: Color(0xFFB71C1C),
+              shape: BoxShape.circle,
+            ),
+            weekNumberTextStyle: TextStyle(color: Colors.white),
+            defaultTextStyle: TextStyle(color: Colors.white),
+            weekendTextStyle: TextStyle(color: Colors.white),
+            outsideTextStyle: TextStyle(color: Colors.white60),
+            withinRangeTextStyle: TextStyle(color: Colors.white),
+            outsideDaysVisible: false,
+            // defaultDecoration: const BoxDecoration(),
+          ),
+          firstDay: DateTime.utc(2010, 10, 16),
+          lastDay: DateTime.utc(2030, 3, 14),
+          focusedDay: DateTime.now(),
+          selectedDayPredicate: (day) {
+            return isSameDay(_selectedDay, day);
+          },
+          onDaySelected: (selectedDay, focusedDay) {
+            print("$selectedDay $focusedDay");
+
+            setState(() {
+              _selectedDay = selectedDay;
+              // _focusedDay = focusedDay; // update `_focusedDay` here as well
+            });
+            selectDate(selectedDay);
+          },
         ),
       ),
     );
