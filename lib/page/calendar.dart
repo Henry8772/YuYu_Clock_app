@@ -56,7 +56,7 @@ class _CalendarState extends State<Calendar> {
 
   Padding eventTitle() {
     return const Padding(
-      padding: EdgeInsets.fromLTRB(24, 8, 8, 8),
+      padding: EdgeInsets.fromLTRB(24, 8, 24, 8),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -76,7 +76,7 @@ class _CalendarState extends State<Calendar> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(36, 8, 24, 8),
+        padding: const EdgeInsets.fromLTRB(36, 8, 36, 8),
         child: Container(
           // color: Colors.orange,
           child: Row(
@@ -93,10 +93,24 @@ class _CalendarState extends State<Calendar> {
                       shrinkWrap: true,
                       itemCount: events.length,
                       itemBuilder: (BuildContext ctxt, int index) {
-                        return createEventBar(
-                            DateFormat('HH:mm')
-                                .format(events[index].createdTime),
-                            formatTime(events[index].duration));
+                        final item = events[index].id.toString();
+                        return Dismissible(
+                          direction: DismissDirection.endToStart,
+                          key: Key(item),
+                          onDismissed: (direction) {
+                            setState(() {
+                              events.removeAt(index);
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('$item dismissed')));
+                          },
+                          background: Container(color: Colors.red),
+                          child: createEventBar(
+                              DateFormat('HH:mm')
+                                  .format(events[index].createdTime),
+                              formatTime(events[index].duration)),
+                        );
                       },
                     ),
                   ],
