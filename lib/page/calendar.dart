@@ -42,6 +42,17 @@ class _CalendarState extends State<Calendar> {
     setState(() {});
   }
 
+  Future deleteCalendarEvent(int id) async {
+    // setState(() => isLoading = true);
+
+    int number = await CalendarDatabase.instance.delete(id);
+    print("Deleted with number of rows left $number");
+
+    // print("$events.id, $this.event.duration");
+
+    // setState(() {});
+  }
+
   void dispose() {
     // _calendarController.dispose();
     super.dispose();
@@ -93,23 +104,39 @@ class _CalendarState extends State<Calendar> {
                       shrinkWrap: true,
                       itemCount: events.length,
                       itemBuilder: (BuildContext ctxt, int index) {
-                        final item = events[index].id.toString();
-                        return Dismissible(
-                          direction: DismissDirection.endToStart,
-                          key: Key(item),
-                          onDismissed: (direction) {
-                            setState(() {
-                              events.removeAt(index);
-                            });
+                        final item = events[index];
+                        final itemText = events[index].id.toString();
+                        return ClipRRect(
+                          clipBehavior: Clip.hardEdge,
+                          child: Dismissible(
+                            direction: DismissDirection.endToStart,
+                            key: Key(itemText),
+                            onDismissed: (direction) {
+                              setState(() {
+                                events.removeAt(index);
+                                deleteCalendarEvent(item.id ?? 0);
+                              });
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('$item dismissed')));
-                          },
-                          background: Container(color: Colors.red),
-                          child: createEventBar(
-                              DateFormat('HH:mm')
-                                  .format(events[index].createdTime),
-                              formatTime(events[index].duration)),
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('$item dismissed')));
+                            },
+                            background: Container(
+                              alignment: AlignmentDirectional.centerEnd,
+                              color: Colors.red,
+                              child: const Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(0.0, 0.0, 20.0, 0.0),
+                                child: Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            child: createEventBar(
+                                DateFormat('HH:mm')
+                                    .format(events[index].createdTime),
+                                formatTime(events[index].duration)),
+                          ),
                         );
                       },
                     ),
