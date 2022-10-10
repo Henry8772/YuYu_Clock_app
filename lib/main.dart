@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simplicity_clock/page/calendar.dart';
+// import 'package:simplicity_clock/page/calendar.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:simplicity_clock/page/page.dart';
 
