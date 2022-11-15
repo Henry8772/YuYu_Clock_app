@@ -24,9 +24,6 @@ class _SliderState extends State<Boarding> {
           Clock(
             clockType: 'Countdown',
           ),
-          Clock(
-            clockType: 'Timer',
-          ),
         ],
         dotsDecorator: getDotDecoration(),
         onDone: () {},

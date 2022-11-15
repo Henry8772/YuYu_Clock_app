@@ -143,7 +143,7 @@ class _ClockState extends State<Clock> with SingleTickerProviderStateMixin {
   }
 
   void startTimer() {
-    if (!isStartTimeStored) {
+    if (!isStartTimeStored && clockType == "Timer") {
       timerStartTime = DateTime.now();
       isStartTimeStored = true;
       print("Timer start time : {$timerStartTime}");
