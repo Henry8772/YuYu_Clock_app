@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     Wakelock.enable();
     WidgetsFlutterBinding.ensureInitialized();
     hideNavBar();
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Flutter Demo',
       home: Boarding(),
       debugShowCheckedModeBanner: false,
